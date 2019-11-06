@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>items</key>
+	<array>
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>label</key>
+			<string>Horizontal Page Bounce</string>
+			<key>footerText</key>
+			<string>Automatic will disable the horizontal page bounce effect for one page (+ camera).</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSSegmentCell</string>
+			<key>key</key>
+			<string>horizontalBounce</string>
+			<key>validTitles</key>
+			<array>
+				<string>Disable</string>
+				<string>Automatic</string>
+				<string>Enable</string>
+			</array>
+			<key>validValues</key>
+			<array>
+				<integer>0</integer>
+				<integer>1</integer>
+				<integer>2</integer>
+			</array>
+			<key>default</key>
+			<integer>1</integer>
+			<key>defaults</key>
+			<string>com.dgh0st.forcelsshortcuts</string>
+			<key>PostNotification</key>
+			<string>com.dgh0st.forcelsshortcuts/settingschanged</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>label</key>
+			<string>Page Control Visibility</string>
+			<key>footerText</key>
+			<string>Automatic will hide the page dots if there is only one page (+ camera).</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSSegmentCell</string>
+			<key>key</key>
+			<string>pageControlVisibility</string>
+			<key>validTitles</key>
+			<array>
+				<string>Hidden</string>
+				<string>Automatic</string>
+				<string>Visible</string>
+			</array>
+			<key>validValues</key>
+			<array>
+				<integer>0</integer>
+				<integer>1</integer>
+				<integer>2</integer>
+			</array>
+			<key>default</key>
+			<integer>1</integer>
+			<key>defaults</key>
+			<string>com.dgh0st.forcelsshortcuts</string>
+			<key>PostNotification</key>
+			<string>com.dgh0st.forcelsshortcuts/settingschanged</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>label</key>
+			<string>Credits</string>
+			<key>footerText</key>
+			<string>Enjoy the tweak :)</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSButtonCell</string>
+			<key>action</key>
+			<string>email</string>
+			<key>label</key>
+			<string>Email Support</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSButtonCell</string>
+			<key>action</key>
+			<string>donate</string>
+			<key>label</key>
+			<string>Donate</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSButtonCell</string>
+			<key>action</key>
+			<string>follow</string>
+			<key>label</key>
+			<string>Follow on twitter (@D_Gh0st)</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>footerAlignment</key>
+			<integer>1</integer>
+			<key>footerText</key>
+			<string>ForceLSShortcuts © 2019 DGh0st</string>
+		</dict>
+	</array>
+	<key>title</key>
+	<string>ForceLSShortcuts</string>
+</dict>
+</plist>
