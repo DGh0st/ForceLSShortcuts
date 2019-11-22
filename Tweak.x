@@ -17,57 +17,55 @@ typedef enum Visibility : NSInteger {
 static BounceStrategy horizontalBounce = AutomaticBounce;
 static Visibility pageControlVisibility = AutomaticHide;
 
-@interface UIScreen (ForceLSShortcutsPrivate) // iOS 4 - 12
-@property (nonatomic, readonly) CGRect _referenceBounds; // iOS 9 - 12
+@interface UICoverSheetButton : UIView // iOS 11 - 13
+-(void)setEdgeInsets:(UIEdgeInsets)arg1; // iOS 11 - 13
 @end
 
-@interface UICoverSheetButton : UIView // iOS 11 - 12
+@interface QuickActionsButton : UICoverSheetButton // iOS 11 - 12 (SBDashBoardQuickActionsButton), iOS 13 (CSQuickActionsButton)
 @end
 
-@interface SBDashBoardQuickActionsButton : UICoverSheetButton // iOS 11 - 12
--(void)setEdgeInsets:(UIEdgeInsets)arg1; // iOS 11 - 12
+@interface QuickActionView : UIView // iOS 11 - 12 (SBDashBoardQuickActionsView), iOS 13 (CSQuickActionsView)
+@property (nonatomic, retain) QuickActionsButton *flashlightButton; // iOS 11 - 13
+@property (nonatomic, retain) QuickActionsButton *cameraButton; // iOS 11 - 13
+-(UIEdgeInsets)_buttonOutsets; // iOS 11 - 13
 @end
 
-@interface SBDashBoardQuickActionsView : UIView // iOS 11 - 12
-@property (nonatomic, retain) SBDashBoardQuickActionsButton *flashlightButton; // iOS 11 - 12
-@property (nonatomic, retain) SBDashBoardQuickActionsButton *cameraButton; // iOS 11 - 12
--(UIEdgeInsets)_buttonOutsets; // iOS 11 - 12
-@end
-
-@interface SBPagedScrollView : UIScrollView // iOS 10 - 12
+@interface PagedScrollView : UIScrollView // iOS 10 - 12 (SBPagedScrollView), iOS 13 (SBFPagedScrollView)
 -(void)setBouncesHorizontally:(BOOL)arg1; // inherited from UIScrollView
 @end
 
-@interface SBDashBoardView : UIView // 10 - 12
-@property (nonatomic, retain) SBPagedScrollView *scrollView; // iOS 10 - 12
+@interface CSView : UIView // 10 - 12 (SBDashBoardView), iOS 13 (CSCoverSheetView)
+@property (nonatomic, retain) PagedScrollView *scrollView; // iOS 10 - 13
 @end
 
-@interface SBDashBoardFixedFooterView : UIView // iOS 11 - 12
--(void)_layoutPageControl; // iOS 11 - 12
+@interface FixedFooterView : UIView // iOS 11 - 12 (SBDashBoardFixedFooterView), iOS 13 (CSFixedFooterView)
+-(void)_layoutPageControl; // iOS 11 - 13
 @end
 
-@interface SBDashBoardFixedFooterViewController : UIViewController // iOS 11 - 12
-@property (nonatomic, readonly) SBDashBoardFixedFooterView *fixedFooterView; // iOS 11 - 12
+@interface FixedFooterViewController : UIViewController // iOS 11 - 12 (SBDashBoardFixedFooterViewController), iOS 13 (CSFixedFooterViewController)
+@property (nonatomic, readonly) FixedFooterView *fixedFooterView; // iOS 11 - 13
 @end
 
-@interface SBDashBoardViewController : UIViewController { // iOS 10 - 12
-	SBDashBoardFixedFooterViewController *_fixedFooterViewController; // iOS 11 - 12
+@interface CSViewController : UIViewController { // iOS 10 - 12 (SBDashBoardViewController), iOS 13 (CSCoverSheetViewController)
+	FixedFooterViewController *_fixedFooterViewController; // iOS 11 - 13
 }
-@property (nonatomic, readonly) SBDashBoardView *dashBoardView; // iOS 11 - 12
-@property (setter=_setAllowedPageViewControllers:, getter=_allowedPageViewControllers, nonatomic, copy) NSArray *allowedPageViewControllers; // iOS 10 - 12
--(void)_updatePageContent; // iOS 10 - 12
+@property (nonatomic, readonly) CSView *dashBoardView; // iOS 11 - 12
+@property (nonatomic, readonly) CSView *coverSheetView; // iOS 13
+@property (setter=_setAllowedPageViewControllers:, getter=_allowedPageViewControllers, nonatomic, copy) NSArray *allowedPageViewControllers; // iOS 10 - 13
+-(void)_updatePageContent; // iOS 10 - 13
 @end
 
-@interface SBCoverSheetPresentationManager : NSObject // iOS 11 - 12
-+(id)sharedInstance; // iOS 11 - 12
--(id)dashBoardViewController; // iOS 11 - 12
-@end
-
-@interface SBDashBoardPageControl : UIPageControl // iOS 10 - 12
+@interface PageControl : UIPageControl // iOS 10 - 12 (SBDashBoardPageControl), iOS 13 (CSPageControl)
 @property (assign, nonatomic) NSUInteger cameraPageIndex; // iOS 11 - 12
 @end
 
-%hook SBDashBoardQuickActionsViewController
+@interface SBCoverSheetPresentationManager : NSObject // iOS 11 - 13
++(id)sharedInstance; // iOS 11 - 13
+-(id)dashBoardViewController; // iOS 11 - 12
+-(id)coverSheetViewController; // iOS 13
+@end
+
+%hook QuickActionsViewController
 +(BOOL)deviceSupportsButtons {
 	return YES;
 }
@@ -81,59 +79,60 @@ static inline CGFloat GetButtonSize(CGRect screenBounds) {
 	return 42;
 }
 
-%hook SBDashBoardQuickActionsView
+%hook QuickActionView
 -(void)_layoutQuickActionButtons {
 	UIEdgeInsets insets = [self _buttonOutsets];
-	[self.flashlightButton setEdgeInsets:insets];
-	[self.cameraButton setEdgeInsets:insets];
+	[[self flashlightButton] setEdgeInsets:insets];
+	[[self cameraButton] setEdgeInsets:insets];
 
 	UIUserInterfaceLayoutDirection layoutDirection = [UIApplication sharedApplication].userInterfaceLayoutDirection;
-	CGRect _referenceBounds = [UIScreen mainScreen]._referenceBounds;
-	CGFloat buttonSize = GetButtonSize(_referenceBounds);
+	CGRect screenBounds = [UIScreen mainScreen].bounds;
+	CGFloat buttonSize = GetButtonSize(screenBounds);
 	CGFloat xOffsetPadding = layoutDirection == UIUserInterfaceLayoutDirectionRightToLeft ? insets.right : insets.left;
 	CGFloat buttonWidth = buttonSize + insets.right + insets.left;
 	CGFloat buttonHeight = buttonSize + insets.top + insets.bottom;
-	CGFloat offsetY = _referenceBounds.size.height - buttonHeight - insets.bottom;
+	CGFloat offsetY = screenBounds.size.height - buttonHeight - insets.bottom;
 
 	CGRect flashLightRect;
 	CGRect cameraRect;
 	if (layoutDirection == UIUserInterfaceLayoutDirectionRightToLeft) {
-		flashLightRect = CGRectMake(_referenceBounds.size.width - xOffsetPadding - buttonWidth, offsetY, buttonWidth, buttonHeight);
+		flashLightRect = CGRectMake(screenBounds.size.width - xOffsetPadding - buttonWidth, offsetY, buttonWidth, buttonHeight);
 		cameraRect = CGRectMake(xOffsetPadding, offsetY, buttonWidth, buttonHeight);
 	} else {
 		flashLightRect = CGRectMake(xOffsetPadding, offsetY, buttonWidth, buttonHeight);
-		cameraRect = CGRectMake(_referenceBounds.size.width - xOffsetPadding - buttonHeight, offsetY, buttonWidth, buttonHeight);
+		cameraRect = CGRectMake(screenBounds.size.width - xOffsetPadding - buttonHeight, offsetY, buttonWidth, buttonHeight);
 	}
-	self.flashlightButton.frame = flashLightRect;
-	self.cameraButton.frame = cameraRect;
+	[self flashlightButton].frame = flashLightRect;
+	[self cameraButton].frame = cameraRect;
 }
 %end
 
-%hook SBDashBoardViewController
+%hook CSViewController
 -(void)_updatePageContent {
 	%orig();
 
+	CSView *view = [self respondsToSelector:@selector(dashBoardView)] ? [self dashBoardView] : [self coverSheetView];
 	if (horizontalBounce == Disable) {
-		[self.dashBoardView.scrollView setBouncesHorizontally:NO];
-	} else if (horizontalBounce == AutomaticHide && self.allowedPageViewControllers.count <= 2) {
-		for (id pageViewController in self.allowedPageViewControllers) {
+		[view.scrollView setBouncesHorizontally:NO];
+	} else if (horizontalBounce == AutomaticHide && [self _allowedPageViewControllers].count <= 2) {
+		for (id pageViewController in [self _allowedPageViewControllers]) {
 			if ([pageViewController isKindOfClass:%c(SBDashBoardCameraPageViewController)]) {
-				[self.dashBoardView.scrollView setBouncesHorizontally:NO];
+				[view.scrollView setBouncesHorizontally:NO];
 				break;
 			}
 		}
 	} else if (horizontalBounce == Enable) {
-		[self.dashBoardView.scrollView setBouncesHorizontally:YES];		
+		[view.scrollView setBouncesHorizontally:YES];
 	}
 }
 %end
 
-%hook SBDashBoardPageControl
+%hook PageControl
 -(CGSize)sizeForNumberOfPages:(NSInteger)arg1 {
-	if ((pageControlVisibility == AutomaticHide && self.cameraPageIndex != NSIntegerMax && arg1 == 2) || pageControlVisibility == Hidden)
-		self.hidden = YES;
+	if ((pageControlVisibility == AutomaticHide && [self cameraPageIndex] != NSIntegerMax && arg1 == 2) || pageControlVisibility == Hidden)
+		[self setHidden:YES];
 	else if (pageControlVisibility == Visible)
-		self.hidden = NO;
+		[self setHidden:NO];
 	return %orig();
 }
 %end
@@ -171,12 +170,13 @@ static void reloadPrefs() {
 	if (!ignoreForceUpdate) {
 		ignoreForceUpdate = false;
 		// force update if needed
-		SBDashBoardViewController *dashBoardViewController = [[%c(SBCoverSheetPresentationManager) sharedInstance] dashBoardViewController];
+		SBCoverSheetPresentationManager *csPresentationManager = [%c(SBCoverSheetPresentationManager) sharedInstance];
+		QuickActionsViewController *quickActionViewController = [csPresentationManager respondsToSelector:@selector(dashBoardViewController)] ? [csPresentationManager dashBoardViewController] : [csPresentationManager coverSheetViewController];
 		if (horizontalBounce != previousHorizontalBounce)
-			[dashBoardViewController _updatePageContent];
+			[quickActionViewController _updatePageContent];
 
 		if (pageControlVisibility != previousPageControlVisibility)
-			[((SBDashBoardFixedFooterViewController *)[dashBoardViewController valueForKey:@"_fixedFooterViewController"]).fixedFooterView _layoutPageControl];
+			[[[quickActionViewController valueForKey:@"_fixedFooterViewController"] fixedFooterView] _layoutPageControl];
 	}
 
 	[prefs release];
@@ -190,4 +190,10 @@ static void reloadPrefs() {
 	reloadPrefs();
 
 	CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), NULL, (CFNotificationCallback)reloadPrefs, kSettingsChangedNotification, NULL, CFNotificationSuspensionBehaviorDeliverImmediately);
+
+	Class quickActionsViewControllerClass = %c(SBDashBoardQuickActionsViewController) ?: %c(CSQuickActionsViewController);
+	Class quickActionViewClass = %c(SBDashBoardQuickActionsView) ?: %c(CSQuickActionsView);
+	Class csViewControllerClass = %c(SBDashBoardViewController) ?: %c(CSCoverSheetViewController);
+	Class pageControlClass = %c(SBDashBoardPageControl) ?: %c(CSPageControl);
+	%init(QuickActionsViewController=quickActionsViewControllerClass, QuickActionView=quickActionViewClass, CSViewController=csViewControllerClass, PageControl=pageControlClass);
 }
